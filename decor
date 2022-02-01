@@ -1,0 +1,37 @@
+from datetime import datetime
+
+def decor(old_function):
+    dict = {}
+
+
+    def new_function(*args, **kwargs):
+        time = datetime.now()
+        argm = args, kwargs
+        old_name = old_function.__name__
+        key = f'{args}{kwargs}'
+        if key in dict:
+            return dict[key]
+        result = old_function(*args, **kwargs)
+        dict[key] = f'Дата и время вызова: {time}', f'Имя: {old_name}', f'С аргументами: {argm}', f'И результатом: {result}'
+        print(dict[key])
+        return result
+
+    return new_function
+
+@decor
+def dvadno(numb1, numb2, numb3, numb4, numb5):
+    sum = numb1 + numb2 + numb3 + numb4 + numb5
+    if sum < 10:
+        return("next time")
+    elif 10 < sum < 21:
+        return("closer")
+    elif sum == 21:
+        return("You WIN")
+    elif 21 < sum < 55:
+        return("ice cold")
+    elif sum == 101:
+        return("not the same game")
+    else:
+        return("repite")
+
+dvadno(10, 1, 0, 0, 0)
