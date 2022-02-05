@@ -1,0 +1,27 @@
+import requests
+from bs4 import BeautifulSoup
+
+response = requests.get('https://habr.com/')
+response.raise_for_status()
+KEYWORDS = {'дизайн', 'Angular', 'web', 'python'}
+
+soup = BeautifulSoup(response.text, features='html.parser')
+articles = soup.find_all('article')
+print(articles)
+for article in articles:
+    full = article.find(class_="tm-article-snippet__meta-container")
+    # hubs = full.find('div', class_="tm-article-snippet__hubs")
+    # hubs1 = hubs.find('span')
+    # hubs1 = set([hub.find('span').text for hub in hubs])
+    # print(hubs1.text)
+    title = article.find('h2', class_="tm-article-snippet__title.tm-article-snippet__title_h2")
+    print(title)
+
+    time = full.find('span', class_="tm-article-snippet__datetime-published")
+    print(time.text)
+
+    #
+    # if KEYWORDS & hubs:
+    #     header = article.find('h2').text
+    #     link = article.find('href')
+    #     print(header)
