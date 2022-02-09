@@ -1,24 +1,32 @@
 import requests
 from bs4 import BeautifulSoup
 
-response = requests.get('https://habr.com/')
+response = requests.get('https://habr.com/ru/all/')
 response.raise_for_status()
 KEYWORDS = {'дизайн', 'Angular', 'web', 'python'}
 
 soup = BeautifulSoup(response.text, features='html.parser')
-articles = soup.find_all('article')
-print(articles)
+articles = soup.find_all('article', class_="tm-articles-list__item")
 for article in articles:
-    full = article.find(class_="tm-article-snippet__meta-container")
+    time = article.find_next('span', class_="tm-article-snippet__datetime-published")
+    print(time.text)
+    hubs = article.find(class_="tm-article-snippet").find(class_="tm-article-snippet__hubs").find_all('span')
+    print(hubs)
+    hubs1 = set()
+    for hub in hubs:
+        hubs1.add(hub.text)
+    print(hubs1)
+    print("----" * 10)
+
+    # full = article.find(class_="tm-article-snippet")
     # hubs = full.find('div', class_="tm-article-snippet__hubs")
     # hubs1 = hubs.find('span')
     # hubs1 = set([hub.find('span').text for hub in hubs])
     # print(hubs1.text)
-    title = article.find('h2', class_="tm-article-snippet__title.tm-article-snippet__title_h2")
-    print(title)
+    # prew = article.find('div', class_="article-formatted-body.article-formatted-body_version-1")
+    # print(prew.text)
 
-    time = full.find('span', class_="tm-article-snippet__datetime-published")
-    print(time.text)
+
 
     #
     # if KEYWORDS & hubs:
