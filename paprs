@@ -1,0 +1,57 @@
+import requests
+from bs4 import BeautifulSoup
+
+headers = {
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36",
+    "bx-ajax": "true"
+}
+
+
+def get_page(url):
+    s = requests.Session()
+    response = s.get(url=url, headers=headers)
+
+    with open("index.html", "w") as file:
+        file.write(response.text)
+
+
+get_page(url="https://habr.com/ru/all/")
+
+
+with open("index.html") as file:
+    sp = file.read()
+
+KEYWORDS = {'дизайн', 'фото', 'Web', 'Python'}
+
+soup = BeautifulSoup(sp, "html.parser")
+soup1 = soup.find(class_="tm-articles-list")
+soup2 = soup1.find_all(class_="tm-articles-list__item")
+for article in soup2:
+    textt = article.find(class_="tm-article-body tm-article-snippet__lead").text
+    Utext = set(textt.split())
+
+    zag = article.find(class_="tm-article-snippet__title-link").text
+    Uzag = set(zag.split())
+
+    tops = article.find_all(class_="tm-article-snippet__hubs-item")
+    Utops = set([top.find('span').text for top in tops])
+
+    time = article.find(class_="tm-article-snippet__datetime-published").text
+    link = article.find(class_="tm-article-snippet__title-link")
+
+    if KEYWORDS & Utext:
+        print(time)
+        print(zag)
+        print(f'habr.com{link.attrs.get("href")}')
+    elif KEYWORDS & Utops:
+        print(time)
+        print(zag)
+        print(f'habr.com{link.attrs.get("href")}')
+    elif KEYWORDS & Uzag:
+        print(time)
+        print(zag)
+        print(f'habr.com{link.attrs.get("href")}')
+
+
+    print("---" * 50)
