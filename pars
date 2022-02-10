@@ -1,35 +1,58 @@
+#переделал, работает
 import requests
 from bs4 import BeautifulSoup
 
-response = requests.get('https://habr.com/ru/all/')
-response.raise_for_status()
-KEYWORDS = {'дизайн', 'Angular', 'web', 'python'}
-
-soup = BeautifulSoup(response.text, features='html.parser')
-articles = soup.find_all('article', class_="tm-articles-list__item")
-for article in articles:
-    time = article.find_next('span', class_="tm-article-snippet__datetime-published")
-    print(time.text)
-    hubs = article.find(class_="tm-article-snippet").find(class_="tm-article-snippet__hubs").find_all('span')
-    print(hubs)
-    hubs1 = set()
-    for hub in hubs:
-        hubs1.add(hub.text)
-    print(hubs1)
-    print("----" * 10)
-
-    # full = article.find(class_="tm-article-snippet")
-    # hubs = full.find('div', class_="tm-article-snippet__hubs")
-    # hubs1 = hubs.find('span')
-    # hubs1 = set([hub.find('span').text for hub in hubs])
-    # print(hubs1.text)
-    # prew = article.find('div', class_="article-formatted-body.article-formatted-body_version-1")
-    # print(prew.text)
+headers = {
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36",
+    "bx-ajax": "true"
+}
 
 
+def get_page(url):
+    s = requests.Session()
+    response = s.get(url=url, headers=headers)
 
-    #
-    # if KEYWORDS & hubs:
-    #     header = article.find('h2').text
-    #     link = article.find('href')
-    #     print(header)
+    with open("index.html", "w") as file:
+        file.write(response.text)
+
+
+get_page(url="https://habr.com/ru/all/")
+
+
+with open("index.html") as file:
+    sp = file.read()
+
+KEYWORDS = {'дизайн', 'фото', 'Web', 'Python'}
+
+soup = BeautifulSoup(sp, "html.parser")
+soup1 = soup.find(class_="tm-articles-list")
+soup2 = soup1.find_all(class_="tm-articles-list__item")
+for article in soup2:
+    textt = article.find(class_="tm-article-body tm-article-snippet__lead").text
+    Utext = set(textt.split())
+
+    zag = article.find(class_="tm-article-snippet__title-link").text
+    Uzag = set(zag.split())
+
+    tops = article.find_all(class_="tm-article-snippet__hubs-item")
+    Utops = set([top.find('span').text for top in tops])
+
+    time = article.find(class_="tm-article-snippet__datetime-published").text
+    link = article.find(class_="tm-article-snippet__title-link")
+
+    if KEYWORDS & Utext:
+        print(time)
+        print(zag)
+        print(f'habr.com{link.attrs.get("href")}')
+    elif KEYWORDS & Utops:
+        print(time)
+        print(zag)
+        print(f'habr.com{link.attrs.get("href")}')
+    elif KEYWORDS & Uzag:
+        print(time)
+        print(zag)
+        print(f'habr.com{link.attrs.get("href")}')
+
+
+    print("---" * 50)
