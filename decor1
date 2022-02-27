@@ -1,15 +1,14 @@
 from datetime import datetime
-import json
-from pathlib import Path
 
 
 def par_decor(way):
 
     def decor(old_function):
-        myfile = Path(f'{way}.py')
-        myfile.touch(exist_ok=True)
-        with open(f'{way}.py', "r") as file:
-            import_spisok = json.load(file)
+        with open(f'{way}.txt', "r") as file:
+            import_spisok = {}
+            for i in file.readlines():
+                key, val = i.strip().split(':')
+                import_spisok[key] = val
 
         def new_function(*args, **kwargs):
             time = datetime.now()
@@ -19,10 +18,11 @@ def par_decor(way):
             if key in import_spisok:
                 return import_spisok[key]
             result = old_function(*args, **kwargs)
-            import_spisok[key] = f'Дата и время вызова: {time}', f'Имя: {old_name}', f'С аргументами: {argm}', f'И результатом: {result}'
+            import_spisok[key] = f'Дата и время вызова: {time}, Имя: {old_name}, С аргументами: {argm}, И результатом: {result}'
             print(import_spisok[key])
-            with open(f'{way}.py', "w") as file:
-                json.dump(import_spisok, file)
+            with open(f'{way}.txt', "w") as file:
+                for key, val in import_spisok.items():
+                    file.write('{}:{}\n'.format(key, val))
             return result
 
         return new_function
